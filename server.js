@@ -15,7 +15,7 @@ app.get('/api/1D/2025', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2025.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2025.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
@@ -34,7 +34,7 @@ app.get('/api/1D/2024', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2024.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2024.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
@@ -53,7 +53,7 @@ app.get('/api/1D/2023', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2023.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2023.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
@@ -72,7 +72,7 @@ app.get('/api/1D/2022', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2022.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2022.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
@@ -91,7 +91,7 @@ app.get('/api/1D/2021', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2021.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2021.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
@@ -110,7 +110,7 @@ app.get('/api/1D/2020', (req, res) => {
     const results = [];
     
     // Use absolute path to the CSV file
-    const filePath = path.join(__dirname, 'files', 'Daily', stockName, '2020.csv');
+    const filePath = path.join(__dirname, 'data', 'Daily', stockName, '2020.csv');
 
     fs.createReadStream(filePath)  // Path to your CSV file
         .pipe(csv())
