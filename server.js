@@ -45,6 +45,10 @@ app.get('/api/1D', (req, res) => {
         });
 });
 
+app.get('/api/valid', (req, res) => {
+  res.send('yes');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
