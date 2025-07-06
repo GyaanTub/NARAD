@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #jsonOutput {
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        canvas {
+            margin-top: 30px;
+            max-width: 100%;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <h1>CSV Data Viewer</h1>
+    <button onclick="fetchCSVData()">Load CSV Data</button>
+
+    <div id="jsonOutput">JSON data will appear here...</div>
+
+    <canvas id="chartCanvas" width="400" height="200"></canvas>
+
+    <script>
+        let chart = null;
+
+        function fetchCSVData() {
+            fetch('http://localhost:3000/api/csv-data/2021')
+                .then(response => response.json())
+                .then(data => {
+                    // Display the JSON data
+                    document.getElementById('jsonOutput').textContent = JSON.stringify(data, null, 2);
+
+                    // Prepare the data for the chart
+                    const labels = data.map(item => item.Date);  // Extract Date
+                    const openData = data.map(item => item.Open);  // Extract Open prices
+                    const closeData = data.map(item => item.Close);  // Extract Close prices
+
+                    console.log(labels);
+                    console.log(openData);
+                    console.log(closeData);
+                    
+                    // Call the function to render the chart
+                    renderChart(labels, openData, closeData);
+
+                    // Call the function to calculate and display the monthly change
+                    calculateMonthlyChange(data);
+                })
+                .catch(error => {
+                    document.getElementById('jsonOutput').textContent = 'Error fetching data';
+                    console.error(error);
+                });
+        }
+
+        function renderChart(labels, openData, closeData) {
+            // Destroy the existing chart if it exists
+            if (chart) {
+                chart.destroy();
+            }
+
+            // Create the chart
+            const ctx = document.getElementById('chartCanvas').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',  // Line chart
+                data: {
+                    labels: labels,  // X-axis (Dates)
+                    datasets: [
+                        {
+                            label: 'Open Price',
+                            data: openData,
+                            borderColor: 'green',
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Close Price',
+                            data: closeData,
+                            borderColor: 'red',
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'NIFTY50 Open vs Close Price'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            ticks: {
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateMonthlyChange(data) {
+            // Group data by month and year
+            const monthlyData = {};
+
+            data.forEach(item => {
+                const date = new Date(item.Date);
+                const yearMonth = `${date.getFullYear()}-${date.getMonth() + 1}`;
+
+                if (!monthlyData[yearMonth]) {
+                    monthlyData[yearMonth] = {
+                        open: item.Open,
+                        close: item.Close,
+                        startDate: date,
+                        endDate: date
+                    };
+                } else {
+                    // Update the last day of the month
+                    monthlyData[yearMonth].endDate = date;
+                    monthlyData[yearMonth].close = item.Close; // Update Close price with the latest
+                }
+            });
+
+            // Calculate change for each month
+            const monthlyChanges = [];
+            for (const month in monthlyData) {
+                const monthData = monthlyData[month];
+                const change = ((monthData.close - monthData.open) / monthData.open) * 100;
+                monthlyChanges.push({
+                    month: month,
+                    change: change.toFixed(2) // Percentage change
+                });
+            }
+
+            // Display the monthly changes in the console or as needed
+            console.log("Monthly Changes:", monthlyChanges);
+
+            // Optionally, you can display the monthly change in a different section
+            const monthlyChangeDisplay = monthlyChanges.map(change => {
+                return `Month: ${change.month}, Change: ${change.change}%`;
+            }).join('\n');
+
+            // Displaying the result
+            document.getElementById('jsonOutput').textContent = monthlyChangeDisplay;
+        }
+    </script>
+
+</body>
+</html>
