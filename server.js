@@ -53,7 +53,7 @@ app.get('/api/backtest', (req, res) => {
         return res.status(400).json({ error: 'Missing "stock" query parameter' });
     }
 
-    const filePath = path.join(__dirname, 'data', 'backtest', stock, `${tf}.csv`);
+    const filePath = path.join(__dirname, 'data', 'backtest', stock, `${timeframe}.csv`);
 
     if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: `File not found for stock "${stock}"` });
