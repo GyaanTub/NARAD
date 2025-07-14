@@ -45,6 +45,33 @@ app.get('/api/1D', (req, res) => {
         });
 });
 
+app.get('/api/backtest', (req, res) => {
+    const stock = req.query.stock;
+    const timeframe = req.query.tf;
+
+    if (!stock) {
+        return res.status(400).json({ error: 'Missing "stock" query parameter' });
+    }
+
+    const filePath = path.join(__dirname, 'data', 'backtest', stock, `${tf}.csv`);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: `File not found for stock "${stock}"` });
+    }
+
+    const results = [];
+
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => {
+            res.json(results);
+        })
+        .on('error', (err) => {
+            res.status(500).json({ error: 'Error reading CSV file', details: err.message });
+        });
+});
+
 app.get('/api/valid', (req, res) => {
   res.send('yes');
 });
