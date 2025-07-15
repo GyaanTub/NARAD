@@ -14,6 +14,14 @@ app.use(cors()); // enable CORS for all routes
 // Allowed years
 const allowedYears = ['2020', '2021', '2022', '2023', '2024', '2025'];
 
+// Serve static files (CSS, JS) directly from the root directory
+app.use(express.static(path.join(__dirname)));
+
+// Route for the main page (index.html)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 app.get('/api/1D', (req, res) => {
     const stock = req.query.stock;
     const year = req.query.year;
