@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NARAD – Network-API for Rapid Agile Development</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    /* The container where the circles move */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    canvas {
+      border-radius: 10px;
+    }
+
+    /* Hero Section Styling */
+    .hero-section {
+      position: absolute;
+      z-index: 10;
+      color: white;
+      text-align: center;
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
+      padding: 3rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px); /* Apply blur effect */
+      text-align: center;
+      max-width: 600px; /* Limit the width of the card */
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+  </style>
+</head>
+<body class="bg-green-600 text-white">
+
+  <!-- Hero Section with Background Card -->
+  <section class="hero-section min-h-screen flex flex-col justify-center items-center relative">
+    <div class="card animate__animated animate__fadeInUp">
+      <h1 class="text-4xl md:text-5xl font-bold">
+        NARAD
+      </h1>
+      <p class="mt-4 text-lg md:text-xl max-w-xl opacity-0 animate__animated animate__fadeInUp animate__delay-1s">
+        Network-API for Rapid Agile Development. <br> Build, integrate, and deploy APIs faster than ever.
+      </p>
+    </div>
+  </section>
+
+  <!-- The canvas where the animated circles will move -->
+  <div id="canvas-container" class="bg-green-400">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script>
+    // Set up the canvas and context
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Function to resize the canvas based on window size
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    // Call resizeCanvas on window resize
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial canvas size setup
+    resizeCanvas();
+
+    // Circle class to handle individual circle properties
+    class Circle {
+      constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.speed = Math.random() * 3 + 2; // Increased speed, random between 2 and 5
+        this.direction = { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 }; // Random direction
+      }
+
+      // Move the circle, applying bouncing effect
+      move() {
+        this.x += this.direction.x * this.speed;
+        this.y += this.direction.y * this.speed;
+
+        // Bounce off the edges
+        if (this.x - this.radius <= 0 || this.x + this.radius >= canvas.width) {
+          this.direction.x = -this.direction.x;
+        }
+        if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
+          this.direction.y = -this.direction.y;
+        }
+      }
+
+      // Draw the circle
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      // Check distance to another circle
+      distanceTo(other) {
+        const dx = this.x - other.x;
+        const dy = this.y - other.y;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+
+    // Create an array to store circles
+    const circles = [];
+    const circleCount = 60; // Increased number of circles
+
+    // Create circles with random positions and add to array
+    for (let i = 0; i < circleCount; i++) {
+      const radius = Math.random() * 3 + 3; // Smaller radius, random between 3 and 6
+      const x = Math.random() * (canvas.width - radius * 2) + radius;
+      const y = Math.random() * (canvas.height - radius * 2) + radius;
+      circles.push(new Circle(x, y, radius, "rgba(255, 255, 255, 0.8)"));
+    }
+
+    // Draw lines between the closest three circles
+    function drawConnections() {
+      for (let i = 0; i < circles.length; i++) {
+        const circleA = circles[i];
+        let distances = [];
+
+        // Find distances to all other circles
+        for (let j = 0; j < circles.length; j++) {
+          if (i === j) continue;
+          const circleB = circles[j];
+          const distance = circleA.distanceTo(circleB);
+          distances.push({ index: j, distance });
+        }
+
+        // Sort by distance and get the closest 3 circles
+        distances.sort((a, b) => a.distance - b.distance);
+        const closest = distances.slice(0, 3);
+
+        // Draw lines to the closest circles
+        for (let k = 0; k < closest.length; k++) {
+          const circleB = circles[closest[k].index];
+          const alpha = 1 / (closest[k].distance / 200); // Make lines fade out with distance
+          ctx.beginPath();
+          ctx.moveTo(circleA.x, circleA.y);
+          ctx.lineTo(circleB.x, circleB.y);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`; // Fade effect on line color
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Main animation loop
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Move and draw each circle
+      circles.forEach(circle => {
+        circle.move();
+        circle.draw();
+      });
+
+      // Draw connections between nearest circles
+      drawConnections();
+
+      requestAnimationFrame(animate); // Continue the animation
+    }
+
+    animate(); // Start the animation
+  </script>
+
+</body>
+</html>
