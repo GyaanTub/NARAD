@@ -3,6 +3,12 @@ const path = require('path');
 const csv = require('csv-parser');
 
 module.exports = (req, res) => {
+  
+  const allowedOrigins = [
+    'https://sankhya-six.vercel.app',
+    'https://quantvidya.vercel.app'
+  ];
+  
   const { stock} = req.query;
 
   if (!stock) {
