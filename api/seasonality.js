@@ -4,6 +4,12 @@ const csv = require('csv-parser');
 const allowedYears = ['2020', '2021', '2022', '2023', '2024', '2025'];
 
 module.exports = (req, res) => {
+  
+  const allowedOrigins = [
+    'https://sankhya-six.vercel.app',
+    'https://quantvidya.vercel.app'
+  ];
+  
   const { stock, year } = req.query;
 
   if (!stock) {
