@@ -5,7 +5,8 @@ module.exports = (req, res) => {
   
   const allowedOrigins = [
     'https://sankhya-six.vercel.app',
-    'https://quantvidya.vercel.app'
+    'https://quantvidya.vercel.app',
+    '*'
   ];
   
   const { stock } = req.query;
