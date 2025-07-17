@@ -5,7 +5,8 @@ const allowedYears = ['2020', '2021', '2022', '2023', '2024', '2025'];
 
 const allowedOrigins = [
   'https://sankhya-six.vercel.app',
-  'https://quantvidya.vercel.app'
+  'https://quantvidya.vercel.app',
+  '*'
 ];
 
 module.exports = (req, res) => {
