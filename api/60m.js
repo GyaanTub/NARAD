@@ -7,6 +7,13 @@ module.exports = (req, res) => {
     'https://sankhya-six.vercel.app',
     'https://quantvidya.vercel.app'
   ];
+
+  // const origin = req.headers.origin;
+  // if (allowedOrigins.includes(origin)) {
+    // res.setHeader('Access-Control-Allow-Origin', origin);
+  // }
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
   
   const { stock } = req.query;
 
